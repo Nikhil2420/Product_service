@@ -2,6 +2,8 @@ package com.ProductService.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.List;
 @Table(name = "category_table")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Getter
 public class Category {
 
     @Id
