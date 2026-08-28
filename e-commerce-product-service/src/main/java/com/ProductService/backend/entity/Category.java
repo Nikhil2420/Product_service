@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,13 +34,27 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Product> productList = new ArrayList<>();
 
-    public void addProduct(Product product){
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public void addProduct(Product product) {
         productList.add(product);
         product.setCategory(this);
     }
 
-    public void removeProduct(Product product){
+    public void removeProduct(Product product) {
         productList.remove(product);
         product.setCategory(null);
+    }
+
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

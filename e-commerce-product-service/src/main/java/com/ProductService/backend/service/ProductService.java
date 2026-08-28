@@ -6,6 +6,7 @@ import com.ProductService.backend.entity.Category;
 import com.ProductService.backend.entity.Product;
 import com.ProductService.backend.repository.CategoryRepository;
 import com.ProductService.backend.repository.ProductRepository;
+import com.ProductService.backend.utility.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class ProductService {
                 .category(category)
                 .build();
         productRepository.save(product);
-        return mapProductToProductResponseDto(product);
+        return ProductMapper.mapProductToProductResponseDto(product);
 
     }
 
@@ -42,7 +43,7 @@ public class ProductService {
         List<Product> products = productRepository.findAll();
         List<ProductResponseDto> productResponseDtos = products.stream()
                 .map(product -> {
-                    return mapProductToProductResponseDto(product);
+                    return ProductMapper.mapProductToProductResponseDto(product);
                 }).toList();
         return productResponseDtos;
     }
@@ -50,7 +51,7 @@ public class ProductService {
     public ProductResponseDto getProduct(Long productId) {
         Optional<Product> product = productRepository.findById(productId);
         if (product.isPresent()) {
-            return mapProductToProductResponseDto(product.get());
+            return ProductMapper.mapProductToProductResponseDto(product.get());
         }
         throw new RuntimeException("No product found for this productId" + ":" + productId);
     }
@@ -64,7 +65,7 @@ public class ProductService {
         product.setStockQuantity(productRequestDto.getStockQuantity());
         product.setAvailable(productRequestDto.isAvailable());
         productRepository.save(product);
-        return mapProductToProductResponseDto(product);
+        return ProductMapper.mapProductToProductResponseDto(product);
     }
 
     public ProductResponseDto deleteProduct(Long id) {
@@ -72,15 +73,6 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No product found for this productId" + ":" + id));
         productRepository.deleteById(id);
-        return mapProductToProductResponseDto(product);
-    }
-
-    public ProductResponseDto mapProductToProductResponseDto(Product product) {
-        return ProductResponseDto.builder()
-                .productName(product.getProductName())
-                .productPrice(product.getProductPrice())
-                .stockQuantity(product.getStockQuantity())
-                .available(product.isAvailable())
-                .build();
+        return ProductMapper.mapProductToProductResponseDto(product);
     }
 }
