@@ -6,40 +6,81 @@ import com.ProductService.backend.entity.Category;
 import com.ProductService.backend.entity.Product;
 import com.ProductService.backend.repository.CategoryRepository;
 import com.ProductService.backend.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     public ProductResponseDto addProduct(ProductRequestDto productRequestDto) {
-        Optional<Category> category = categoryRepository.findById(productRequestDto.getCategoryId());
-        Category category1=null;
-        if(category.isPresent()){
-            category1=category.get();
-        }
+        Category category = categoryRepository.findById(productRequestDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException(
+                                "No category found for the categoryId" + ":" + productRequestDto.getCategoryId()
+                        )
+                );
+
         Product product = Product.builder().productName(productRequestDto.getProductName())
                 .stockQuantity(productRequestDto.getStockQuantity())
                 .isAvailable(productRequestDto.isAvailable())
                 .productPrice(productRequestDto.getProductPrice())
-                .category(category1)
+                .category(category)
                 .build();
         productRepository.save(product);
-        ProductResponseDto productResponseDto = ProductResponseDto.builder()
+        return mapProductToProductResponseDto(product);
+
+    }
+
+    public List<ProductResponseDto> getAllProducts() {
+
+        List<Product> products = productRepository.findAll();
+        List<ProductResponseDto> productResponseDtos = products.stream()
+                .map(product -> {
+                    return mapProductToProductResponseDto(product);
+                }).toList();
+        return productResponseDtos;
+    }
+
+    public ProductResponseDto getProduct(Long productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()) {
+            return mapProductToProductResponseDto(product.get());
+        }
+        throw new RuntimeException("No product found for this productId" + ":" + productId);
+    }
+
+    public ProductResponseDto updateProduct(ProductRequestDto productRequestDto, Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new RuntimeException("No product found for this productId" + ":" + productId));
+        product.setProductPrice(productRequestDto.getProductPrice());
+        product.setProductName(productRequestDto.getProductName());
+        product.setStockQuantity(productRequestDto.getStockQuantity());
+        product.setAvailable(productRequestDto.isAvailable());
+        productRepository.save(product);
+        return mapProductToProductResponseDto(product);
+    }
+
+    public ProductResponseDto deleteProduct(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No product found for this productId" + ":" + id));
+        productRepository.deleteById(id);
+        return mapProductToProductResponseDto(product);
+    }
+
+    public ProductResponseDto mapProductToProductResponseDto(Product product) {
+        return ProductResponseDto.builder()
                 .productName(product.getProductName())
                 .productPrice(product.getProductPrice())
                 .stockQuantity(product.getStockQuantity())
-                .isAvailable(product.isAvailable())
+                .available(product.isAvailable())
                 .build();
-        return productResponseDto;
-
     }
 }
