@@ -33,6 +33,9 @@ public class Purchase {
 
     private LocalDateTime orderDate;
 
+    private Long userId;
+    private String userName;
+    private String role;
     @OneToOne(cascade=CascadeType.ALL)
     /*
         name : What is the name of the foreign-key column in the current entity's table?

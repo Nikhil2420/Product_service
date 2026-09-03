@@ -17,4 +17,7 @@ public class PurchaseResponseDto {
     private PaymentStatus paymentStatus;
     private LocalDate orderDate;
     private DeliveryInfo deliveryInfo;
+    private Long userId;
+    private String userName;
+    private String role;
 }
