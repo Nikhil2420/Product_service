@@ -28,4 +28,8 @@ public class PurchaseRequestDto {
     private int quantity;
 
     private PaymentMethod paymentMethod;
+
+    private Long userId;
+    private String userName;
+    private String role;
 }

@@ -34,6 +34,7 @@ public class PurchaseService {
                 new RuntimeException("No product found for this productId" + ":" + purchaseRequestDto.getProductId()));
         product.setStockQuantity(product.getStockQuantity() - purchaseRequestDto.getQuantity());
         productRepository.save(product);
+        checkUserDetails(purchaseRequestDto);
         createPurchaseEntity(purchaseRequestDto, productResponseDto);
         DeliveryInfo deliveryInfo = DeliveryInfo.builder()
                 .addressDto(purchaseRequestDto.getAddressDto())
@@ -46,8 +47,24 @@ public class PurchaseService {
                 .orderDate(LocalDate.now())
                 .paymentStatus(checkPaymentStatus(purchaseRequestDto.getPaymentMethod()))
                 .deliveryInfo(deliveryInfo)
+                .userId(purchaseRequestDto.getUserId())
+                .userName(purchaseRequestDto.getUserName())
+                .role(purchaseRequestDto.getRole())
                 .build();
 
+    }
+
+    private void checkUserDetails(PurchaseRequestDto purchaseRequestDto) {
+        if(purchaseRequestDto.getUserName() == null){
+            purchaseRequestDto.setUserName("Testing");
+        }
+        if(purchaseRequestDto.getUserId()==null){
+            purchaseRequestDto.setUserId(0L);
+        }
+
+        if(purchaseRequestDto.getRole()==null){
+            purchaseRequestDto.setRole("Testing");
+        }
     }
 
     private void createPurchaseEntity(PurchaseRequestDto purchaseRequestDto, ProductResponseDto productResponseDto) {
@@ -68,6 +85,9 @@ public class PurchaseService {
                 .paymentMethod(purchaseRequestDto.getPaymentMethod())
                 .paymentStatus(checkPaymentStatus(purchaseRequestDto.getPaymentMethod()))
                 .address(address)
+                .userId(purchaseRequestDto.getUserId())
+                .userName(purchaseRequestDto.getUserName())
+                .role(purchaseRequestDto.getRole())
                 .build();
         purchaseRepository.save(purchase);
 
