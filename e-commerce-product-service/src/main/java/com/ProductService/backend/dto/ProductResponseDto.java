@@ -6,6 +6,8 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponseDto {
 
     private String productName;
