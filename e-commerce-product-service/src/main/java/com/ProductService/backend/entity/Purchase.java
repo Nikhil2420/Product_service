@@ -38,7 +38,10 @@ public class Purchase {
         name : What is the name of the foreign-key column in the current entity's table?
         referencedColumnName: Which column in the Address table does that foreign key point to?
      */
-    @JoinColumn(name="address_fk_id",referencedColumnName = "addressId")
+    /*
+        unique = true should prevent the same Address row from being referenced by two different Purchase rows
+     */
+    @JoinColumn(name="address_fk_id",referencedColumnName = "addressId",unique = true)
     private Address address;
 
     @PrePersist

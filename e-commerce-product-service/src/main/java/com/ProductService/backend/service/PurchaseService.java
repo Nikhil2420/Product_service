@@ -57,6 +57,7 @@ public class PurchaseService {
                 .street(purchaseRequestDto.getAddressDto().getStreet())
                 .pinCode(purchaseRequestDto.getAddressDto().getPinCode())
                 .build();
+//        checkDuplicateAddress(address);
 
         Purchase purchase = Purchase.builder()
                 .productId(purchaseRequestDto.getProductId())
