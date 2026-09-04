@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/buy")
+@RequestMapping("/purchases")
 @RequiredArgsConstructor
 public class PurchaseController {
 
@@ -20,6 +20,14 @@ public class PurchaseController {
         PurchaseResponseDto purchaseResponseDto=purchaseService.buyProduct(purchaseRequestDto);
         return new ResponseEntity<>(purchaseResponseDto, HttpStatus.ACCEPTED);
     }
+
+    @GetMapping("/{purchaseId}")
+    public ResponseEntity<PurchaseResponseDto> getPurchaseById(@PathVariable Long purchaseId){
+        PurchaseResponseDto purchaseResponseDto=purchaseService.getPurchaseById(purchaseId);
+        return new ResponseEntity<>(purchaseResponseDto,HttpStatus.FOUND);
+    }
+
+
 
 
 }

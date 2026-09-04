@@ -23,4 +23,8 @@ public class Address {
     private String pinCode;
 
     private String street;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "delivery_info_fk", referencedColumnName = "deliveryInfoId")
+    private DeliveryInfo deliveryInfo;
 }

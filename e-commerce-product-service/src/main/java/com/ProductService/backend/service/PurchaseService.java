@@ -5,6 +5,7 @@ import com.ProductService.backend.constants.PaymentStatus;
 import com.ProductService.backend.constants.ShippingStatus;
 import com.ProductService.backend.dto.*;
 import com.ProductService.backend.entity.Address;
+import com.ProductService.backend.entity.DeliveryInfo;
 import com.ProductService.backend.entity.Product;
 import com.ProductService.backend.entity.Purchase;
 import com.ProductService.backend.repository.ProductRepository;
@@ -13,7 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -35,18 +36,19 @@ public class PurchaseService {
         product.setStockQuantity(product.getStockQuantity() - purchaseRequestDto.getQuantity());
         productRepository.save(product);
         checkUserDetails(purchaseRequestDto);
-        createPurchaseEntity(purchaseRequestDto, productResponseDto);
-        DeliveryInfo deliveryInfo = DeliveryInfo.builder()
+
+        DeliveryInfoDto deliveryInfoDto = DeliveryInfoDto.builder()
                 .addressDto(purchaseRequestDto.getAddressDto())
                 .numberOfDays(calculateDaysBasedOnLocation(purchaseRequestDto.getAddressDto()))
                 .shippingStatus(ShippingStatus.PICKED)
                 .build();
+        createPurchaseEntity(purchaseRequestDto, productResponseDto,deliveryInfoDto);
         return PurchaseResponseDto.builder()
                 .productName(purchaseRequestDto.getProductName())
                 .price(productResponseDto.getProductPrice())
-                .orderDate(LocalDate.now())
+                .orderDateTime(LocalDateTime.now())
                 .paymentStatus(checkPaymentStatus(purchaseRequestDto.getPaymentMethod()))
-                .deliveryInfo(deliveryInfo)
+                .deliveryInfoDto(deliveryInfoDto)
                 .userId(purchaseRequestDto.getUserId())
                 .userName(purchaseRequestDto.getUserName())
                 .role(purchaseRequestDto.getRole())
@@ -67,12 +69,13 @@ public class PurchaseService {
         }
     }
 
-    private void createPurchaseEntity(PurchaseRequestDto purchaseRequestDto, ProductResponseDto productResponseDto) {
+    private void createPurchaseEntity(PurchaseRequestDto purchaseRequestDto, ProductResponseDto productResponseDto,DeliveryInfoDto deliveryInfoDto) {
         Address address = Address.builder()
                 .state(purchaseRequestDto.getAddressDto().getState())
                 .city(purchaseRequestDto.getAddressDto().getCity())
                 .street(purchaseRequestDto.getAddressDto().getStreet())
                 .pinCode(purchaseRequestDto.getAddressDto().getPinCode())
+                .deliveryInfo(new DeliveryInfo(deliveryInfoDto.getNumberOfDays(),deliveryInfoDto.getShippingStatus()))
                 .build();
 //        checkDuplicateAddress(address);
 
@@ -114,4 +117,42 @@ public class PurchaseService {
         }
     }
 
+    public PurchaseResponseDto getPurchaseById(Long purchaseId) {
+        Purchase purchase=purchaseRepository.findById(purchaseId).orElseThrow(()->
+                new RuntimeException("No Purchase found for this purchaseId:"+" "+purchaseId)
+                );
+        return mapPurchaseToPurchaseResponseDto(purchase);
+    }
+
+    private PurchaseResponseDto mapPurchaseToPurchaseResponseDto(Purchase purchase) {
+        return PurchaseResponseDto.builder()
+                .userId(purchase.getUserId())
+                .userName(purchase.getUserName())
+                .role(purchase.getRole())
+                .price(purchase.getPrice())
+                .productName(purchase.getProductName())
+                .orderDateTime(purchase.getOrderDate())
+                .paymentStatus(purchase.getPaymentStatus())
+                .deliveryInfoDto(createDeliveryInfoDto(purchase))
+                .build();
+    }
+
+    private DeliveryInfoDto createDeliveryInfoDto(Purchase purchase){
+        Address address=purchase.getAddress();
+        return DeliveryInfoDto.builder()
+                .shippingStatus(address.getDeliveryInfo().getShippingStatus())
+                .numberOfDays(address.getDeliveryInfo().getNumberOfDays())
+                .addressDto(mapAddressToAddressDto(purchase.getAddress()))
+                .build();
+
+    }
+
+    private AddressDto mapAddressToAddressDto(Address address) {
+        return AddressDto.builder()
+                .state(address.getState())
+                .street(address.getStreet())
+                .city(address.getCity())
+                .pinCode(address.getPinCode())
+                .build();
+    }
 }

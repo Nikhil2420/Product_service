@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class DeliveryInfo {
+public class DeliveryInfoDto {
 
     private Integer numberOfDays;
     private AddressDto addressDto;
