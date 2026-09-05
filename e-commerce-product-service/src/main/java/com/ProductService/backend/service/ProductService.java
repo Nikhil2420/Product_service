@@ -33,6 +33,13 @@ public class ProductService {
                 .productPrice(productRequestDto.getProductPrice())
                 .category(category)
                 .build();
+        /*
+            To keep both Java objects synchronized but because of
+            mappedBy = "category" tells Hibernate:
+            "Look at the category field in Product to find which products belong to this Category."
+            when we do category.getProductlist()
+         */
+        // category.addProduct(product);
         productRepository.save(product);
         return ProductMapper.mapProductToProductResponseDto(product);
 
@@ -72,6 +79,20 @@ public class ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No product found for this productId" + ":" + id));
+
+
+        /*
+            product.getCategory().removeProduct(product);this is not required but
+            it is better to do this for java object synchronization
+         */
+        /* Hibernate do this when we do category.getProductList()
+            SELECT *
+            FROM product_table
+            WHERE category_id = ?;
+            Since the deleted product is no longer
+            in product_table,
+            Hibernate creates the newly loaded productList without that product
+         */
         productRepository.deleteById(id);
         return ProductMapper.mapProductToProductResponseDto(product);
     }
