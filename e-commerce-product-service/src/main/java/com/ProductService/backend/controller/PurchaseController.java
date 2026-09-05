@@ -17,24 +17,30 @@ import java.util.List;
 public class PurchaseController {
 
     private final PurchaseService purchaseService;
+
     @PostMapping("/product")
-    public ResponseEntity<PurchaseResponseDto> buyProduct(@RequestBody @Valid PurchaseRequestDto purchaseRequestDto){
-        PurchaseResponseDto purchaseResponseDto=purchaseService.buyProduct(purchaseRequestDto);
+    public ResponseEntity<PurchaseResponseDto> buyProduct(@RequestBody @Valid PurchaseRequestDto purchaseRequestDto) {
+        PurchaseResponseDto purchaseResponseDto = purchaseService.buyProduct(purchaseRequestDto);
         return new ResponseEntity<>(purchaseResponseDto, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/{purchaseId}")
-    public ResponseEntity<PurchaseResponseDto> getPurchaseById(@PathVariable Long purchaseId){
-        PurchaseResponseDto purchaseResponseDto=purchaseService.getPurchaseById(purchaseId);
-        return new ResponseEntity<>(purchaseResponseDto,HttpStatus.FOUND);
+    public ResponseEntity<PurchaseResponseDto> getPurchaseById(@PathVariable Long purchaseId) {
+        PurchaseResponseDto purchaseResponseDto = purchaseService.getPurchaseById(purchaseId);
+        return new ResponseEntity<>(purchaseResponseDto, HttpStatus.FOUND);
     }
 
 
-    @GetMapping("history/{userId}")
-    public ResponseEntity<List<PurchaseResponseDto>> getPurchaseHistory(@PathVariable Long userId){
-        List<PurchaseResponseDto> purchaseResponseDtos=purchaseService.getPurchaseHistory(userId);
-        return new ResponseEntity<>(purchaseResponseDtos,HttpStatus.FOUND);
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<PurchaseResponseDto>> getPurchaseHistory(@PathVariable Long userId) {
+        List<PurchaseResponseDto> purchaseResponseDtos = purchaseService.getPurchaseHistory(userId);
+        return new ResponseEntity<>(purchaseResponseDtos, HttpStatus.FOUND);
     }
 
+    @PatchMapping("/{purchaseId}/cancel")
+    public ResponseEntity<PurchaseResponseDto> cancelProduct(@PathVariable Long purchaseId) {
+        PurchaseResponseDto purchaseResponseDto = purchaseService.cancelProduct(purchaseId);
+        return new ResponseEntity<>(purchaseResponseDto, HttpStatus.ACCEPTED);
+    }
 
 }

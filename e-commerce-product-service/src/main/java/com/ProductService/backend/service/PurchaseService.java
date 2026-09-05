@@ -32,11 +32,14 @@ public class PurchaseService {
         ProductResponseDto productResponseDto = productService.getProduct(purchaseRequestDto.getProductId());
 
         PurchaseUtility.validateInputRequest(purchaseRequestDto, productResponseDto);
-
+        //isAvailable logic code
 
         Product product = productRepository.findById(purchaseRequestDto.getProductId()).orElseThrow(() ->
                 new RuntimeException("No product found for this productId" + ":" + purchaseRequestDto.getProductId()));
         product.setStockQuantity(product.getStockQuantity() - purchaseRequestDto.getQuantity());
+        if(product.getStockQuantity()==0){
+            product.setAvailable(false);
+        }
         productRepository.save(product);
         PurchaseUtility.checkUserDetails(purchaseRequestDto);
 
@@ -99,6 +102,27 @@ public class PurchaseService {
     public List<PurchaseResponseDto> getPurchaseHistory(Long userId) {
         List<Purchase> purchases = purchaseRepository.findByUserId(userId);
         return PurchaseUtility.mapListOfPurchaseToListOfPurchaseResponseDto(purchases);
+    }
+
+    public PurchaseResponseDto cancelProduct(Long purchaseId) {
+        Purchase purchase=purchaseRepository.findById(purchaseId)
+                .orElseThrow(()->(
+                     new RuntimeException("No Purchase found for the provided purchase id:"+" : "+purchaseId)
+                ));
+
+        PurchaseUtility.validatePurchaseShippingState(purchase);
+        Product product=productRepository.findById(purchase.getProductId())
+                .orElseThrow(()->new RuntimeException("No product found for this productId"+" : "+purchase.getProductId()));
+
+        //isPossibleToCancel logic
+        product.setStockQuantity(product.getStockQuantity()+purchase.getQuantity());
+        productRepository.save(product);
+
+        purchase.getAddress()
+                .getDeliveryInfo()
+                .setShippingStatus(ShippingStatus.CANCELLED);
+        purchaseRepository.save(purchase);
+        return PurchaseUtility.mapPurchaseToPurchaseResponseDto(purchase);
     }
 
 }

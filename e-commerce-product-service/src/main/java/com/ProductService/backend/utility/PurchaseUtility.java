@@ -2,6 +2,7 @@ package com.ProductService.backend.utility;
 
 import com.ProductService.backend.constants.PaymentMethod;
 import com.ProductService.backend.constants.PaymentStatus;
+import com.ProductService.backend.constants.ShippingStatus;
 import com.ProductService.backend.dto.*;
 import com.ProductService.backend.entity.Address;
 import com.ProductService.backend.entity.Purchase;
@@ -79,5 +80,17 @@ public class PurchaseUtility {
     public static List<PurchaseResponseDto> mapListOfPurchaseToListOfPurchaseResponseDto(List<Purchase> purchases) {
         return purchases.stream()
                 .map(PurchaseUtility::mapPurchaseToPurchaseResponseDto).toList();
+    }
+
+    public static void validatePurchaseShippingState(Purchase purchase) {
+        ShippingStatus shippingStatus = purchase
+                .getAddress()
+                .getDeliveryInfo()
+                .getShippingStatus();
+
+        if (shippingStatus == ShippingStatus.CANCELLED || shippingStatus == ShippingStatus.FAILED || shippingStatus == ShippingStatus.DELIVERED) {
+            throw new RuntimeException("Product cannot be cancelled because it is already in state" + " : " + shippingStatus);
+        }
+
     }
 }
