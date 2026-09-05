@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/purchases")
 @RequiredArgsConstructor
@@ -28,6 +30,11 @@ public class PurchaseController {
     }
 
 
+    @GetMapping("history/{userId}")
+    public ResponseEntity<List<PurchaseResponseDto>> getPurchaseHistory(@PathVariable Long userId){
+        List<PurchaseResponseDto> purchaseResponseDtos=purchaseService.getPurchaseHistory(userId);
+        return new ResponseEntity<>(purchaseResponseDtos,HttpStatus.FOUND);
+    }
 
 
 }
