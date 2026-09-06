@@ -11,6 +11,7 @@ import com.ProductService.backend.entity.Product;
 import com.ProductService.backend.entity.Purchase;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.repository.PurchaseRepository;
+import com.ProductService.backend.utility.ProductMapper;
 import com.ProductService.backend.utility.PurchaseUtility;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,10 @@ public class PurchaseService {
         Product product = productRepository.findById(purchaseRequestDto.getProductId()).orElseThrow(() ->
                 new RuntimeException("No product found for this productId" + ":" + purchaseRequestDto.getProductId()));
         product.setStockQuantity(product.getStockQuantity() - purchaseRequestDto.getQuantity());
-        if(product.getStockQuantity()==0){
+        if (product.getStockQuantity() == 0) {
             product.setAvailable(false);
         }
+        product.setTotalProductSold(product.getTotalProductSold() + 1);
         productRepository.save(product);
         PurchaseUtility.checkUserDetails(purchaseRequestDto);
 
@@ -105,17 +107,20 @@ public class PurchaseService {
     }
 
     public PurchaseResponseDto cancelProduct(Long purchaseId) {
-        Purchase purchase=purchaseRepository.findById(purchaseId)
-                .orElseThrow(()->(
-                     new RuntimeException("No Purchase found for the provided purchase id:"+" : "+purchaseId)
+        Purchase purchase = purchaseRepository.findById(purchaseId)
+                .orElseThrow(() -> (
+                        new RuntimeException("No Purchase found for the provided purchase id:" + " : " + purchaseId)
                 ));
 
         PurchaseUtility.validatePurchaseShippingState(purchase);
-        Product product=productRepository.findById(purchase.getProductId())
-                .orElseThrow(()->new RuntimeException("No product found for this productId"+" : "+purchase.getProductId()));
+        Product product = productRepository.findById(purchase.getProductId())
+                .orElseThrow(() -> new RuntimeException("No product found for this productId" + " : " + purchase.getProductId()));
 
         //isPossibleToCancel logic
-        product.setStockQuantity(product.getStockQuantity()+purchase.getQuantity());
+        product.setStockQuantity(product.getStockQuantity() + purchase.getQuantity());
+        if (product.getTotalProductSold() > 0) {
+            product.setTotalProductSold(product.getTotalProductSold() - 1);
+        }
         productRepository.save(product);
 
         purchase.getAddress()
@@ -124,5 +129,4 @@ public class PurchaseService {
         purchaseRepository.save(purchase);
         return PurchaseUtility.mapPurchaseToPurchaseResponseDto(purchase);
     }
-
 }
