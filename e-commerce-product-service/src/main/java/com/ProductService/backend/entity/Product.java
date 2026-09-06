@@ -24,6 +24,8 @@ public class Product {
     private long stockQuantity;
     private boolean isAvailable;
     private double productPrice;
+    @Column(nullable = false)
+    private Long totalProductSold;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

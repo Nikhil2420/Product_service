@@ -32,6 +32,7 @@ public class ProductService {
                 .isAvailable(productRequestDto.isAvailable())
                 .productPrice(productRequestDto.getProductPrice())
                 .category(category)
+                .totalProductSold(0L)
                 .build();
         /*
             To keep both Java objects synchronized but because of
@@ -49,6 +50,10 @@ public class ProductService {
 
         List<Product> products = productRepository.findAll();
         List<ProductResponseDto> productResponseDtos = products.stream()
+                /*
+                    only return available product
+                 */
+                .filter(product->product.isAvailable())
                 .map(product -> {
                     return ProductMapper.mapProductToProductResponseDto(product);
                 }).toList();
@@ -95,5 +100,22 @@ public class ProductService {
          */
         productRepository.deleteById(id);
         return ProductMapper.mapProductToProductResponseDto(product);
+    }
+
+    public List<ProductResponseDto> getTopSellerProduct() {
+        List<Product> products=productRepository.findAll();
+
+        long max=0;
+        for(Product product:products){
+            max=Math.max(max,(long)product.getTotalProductSold());
+        }
+        long finalMax = max;
+        return products.stream()
+                .filter(product->(product.getTotalProductSold()== finalMax))
+                .map(product -> {
+                   return ProductMapper.mapProductToProductResponseDto(product);
+                }).toList();
+
+
     }
 }

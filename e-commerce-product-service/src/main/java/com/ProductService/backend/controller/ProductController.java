@@ -51,4 +51,9 @@ public class ProductController {
         return new ResponseEntity<>(productResponseDto,HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/topSeller")
+    public ResponseEntity<List<ProductResponseDto>> getTopSellerProduct(){
+        List<ProductResponseDto> productResponseDtos=productService.getTopSellerProduct();
+        return new ResponseEntity<>(productResponseDtos,HttpStatus.FOUND);
+    }
 }
