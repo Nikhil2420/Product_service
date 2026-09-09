@@ -11,7 +11,6 @@ import com.ProductService.backend.entity.Product;
 import com.ProductService.backend.entity.Purchase;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.repository.PurchaseRepository;
-import com.ProductService.backend.utility.ProductMapper;
 import com.ProductService.backend.utility.PurchaseUtility;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -116,7 +115,7 @@ public class PurchaseService {
         Product product = productRepository.findById(purchase.getProductId())
                 .orElseThrow(() -> new RuntimeException("No product found for this productId" + " : " + purchase.getProductId()));
 
-        //isPossibleToCancel logic
+        //RefundLogic If payment method upi
         product.setStockQuantity(product.getStockQuantity() + purchase.getQuantity());
         if (product.getTotalProductSold() > 0) {
             product.setTotalProductSold(product.getTotalProductSold() - 1);

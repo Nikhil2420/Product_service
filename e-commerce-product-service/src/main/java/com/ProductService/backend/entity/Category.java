@@ -31,7 +31,7 @@ public class Category {
         it tells Hibernate that the foreign key
         is managed by the other entity's field.
     */
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
     private List<Product> productList = new ArrayList<>();
 
     private LocalDateTime createdAt;
