@@ -38,4 +38,22 @@ public class CategoryService {
     }
 
 
+    public CategoryResponseDto deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("No Category found for this id" + " : " + id)
+                );
+        /*
+            we have to delete related  product also that belong to this category;
+            other foreign key violation error we will get
+            added cascade on category
+        */
+
+        categoryRepository.deleteById(id);
+
+        return CategoryResponseDto.builder()
+                .CategoryName(category.getCategoryName())
+                .productDtoList(ProductMapper.mapProductToProductDto(category.getProductList()))
+                .build();
+    }
 }
