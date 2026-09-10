@@ -32,4 +32,5 @@ public class PurchaseRequestDto {
     private Long userId;
     private String userName;
     private String role;
+    private String userEmail;
 }

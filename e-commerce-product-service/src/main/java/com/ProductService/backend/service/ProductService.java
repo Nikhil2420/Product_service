@@ -27,6 +27,7 @@ public class ProductService {
                         )
                 );
 
+        //check if product already present;
         Product product = Product.builder().productName(productRequestDto.getProductName())
                 .stockQuantity(productRequestDto.getStockQuantity())
                 .isAvailable(productRequestDto.isAvailable())

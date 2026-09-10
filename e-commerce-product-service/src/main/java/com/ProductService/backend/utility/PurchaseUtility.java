@@ -6,23 +6,12 @@ import com.ProductService.backend.constants.ShippingStatus;
 import com.ProductService.backend.dto.*;
 import com.ProductService.backend.entity.Address;
 import com.ProductService.backend.entity.Purchase;
+import com.ProductService.backend.entity.User;
 
 import java.util.List;
 
 public class PurchaseUtility {
 
-    public static void checkUserDetails(PurchaseRequestDto purchaseRequestDto) {
-        if (purchaseRequestDto.getUserName() == null) {
-            purchaseRequestDto.setUserName("Testing");
-        }
-        if (purchaseRequestDto.getUserId() == null) {
-            purchaseRequestDto.setUserId(0L);
-        }
-
-        if (purchaseRequestDto.getRole() == null) {
-            purchaseRequestDto.setRole("Testing");
-        }
-    }
 
     public static int calculateDaysBasedOnLocation(AddressDto addressDto) {
         //logic to calculate no. of days to deliver the order
@@ -47,9 +36,10 @@ public class PurchaseUtility {
 
     public static PurchaseResponseDto mapPurchaseToPurchaseResponseDto(Purchase purchase) {
         return PurchaseResponseDto.builder()
-                .userId(purchase.getUserId())
-                .userName(purchase.getUserName())
-                .role(purchase.getRole())
+                .userId(purchase.getUser().getUserId())
+                .userName(purchase.getUser().getUserName())
+                .role(purchase.getUser().getUserRole())
+                .userEmail(purchase.getUser().getUserEmail())
                 .price(purchase.getPrice())
                 .productName(purchase.getProductName())
                 .orderDateTime(purchase.getOrderDate())
