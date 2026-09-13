@@ -33,4 +33,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Purchase> purchases;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_fk_id",referencedColumnName = "cartId")
+    private Cart cart;
+
 }
