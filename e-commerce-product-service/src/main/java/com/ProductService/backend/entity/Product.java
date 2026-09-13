@@ -34,6 +34,10 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "cart_fk_id",referencedColumnName = "cartId")
+    private Cart cart;
+
     // Called automatically before INSERT
     // Run this method automatically just before a new entity is INSERTED into the database.
     @PrePersist
