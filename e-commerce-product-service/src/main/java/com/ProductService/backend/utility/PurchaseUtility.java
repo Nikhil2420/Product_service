@@ -7,6 +7,8 @@ import com.ProductService.backend.dto.*;
 import com.ProductService.backend.entity.Address;
 import com.ProductService.backend.entity.Purchase;
 import com.ProductService.backend.entity.User;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -82,5 +84,14 @@ public class PurchaseUtility {
             throw new RuntimeException("Product cannot be cancelled because it is already in state" + " : " + shippingStatus);
         }
 
+    }
+
+    public static Address mapAddressDtoToAddress(AddressDto addressDto) {
+        return Address.builder()
+                .city(addressDto.getCity())
+                .state(addressDto.getState())
+                .street(addressDto.getStreet())
+                .pinCode(addressDto.getPinCode())
+                .build();
     }
 }

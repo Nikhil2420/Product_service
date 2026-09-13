@@ -37,4 +37,9 @@ public class User {
     @JoinColumn(name = "cart_fk_id",referencedColumnName = "cartId")
     private Cart cart;
 
+    //logic for these
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_fk_id",referencedColumnName = "addressId")
+    private Address address;
+
 }

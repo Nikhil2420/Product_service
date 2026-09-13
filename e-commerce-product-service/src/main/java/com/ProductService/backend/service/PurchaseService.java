@@ -138,6 +138,7 @@ public class PurchaseService {
                 .userName(purchaseRequestDto.getUserName())
                 .userRole(purchaseRequestDto.getRole())
                 .userEmail(purchaseRequestDto.getUserEmail())
+                .address(PurchaseUtility.mapAddressDtoToAddress(purchaseRequestDto.getAddressDto()))
                 .build();
         return userRepository.save(user);
     }
