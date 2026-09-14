@@ -19,22 +19,28 @@ public class CategoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<CategoryResponseDto> addCategory(@RequestBody CategoryRequestDto categoryRequestDto){
+    public ResponseEntity<CategoryResponseDto> addCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
 
-        CategoryResponseDto responseDto=categoryService.addCategory(categoryRequestDto);
+        CategoryResponseDto responseDto = categoryService.addCategory(categoryRequestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/get")
-    public ResponseEntity<List<CategoryResponseDto>> getCategory(){
-        List<CategoryResponseDto> categoryResponseDtos=categoryService.getAllCategory();
-        return new ResponseEntity<>(categoryResponseDtos,HttpStatus.ACCEPTED);
+    public ResponseEntity<List<CategoryResponseDto>> getCategory() {
+        List<CategoryResponseDto> categoryResponseDtos = categoryService.getAllCategory();
+        return new ResponseEntity<>(categoryResponseDtos, HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/delete/{categoryId}")
-    public ResponseEntity<CategoryResponseDto> deleteCategory(@PathVariable(name = "categoryId")Long id ){
-        CategoryResponseDto categoryResponseDto=categoryService.deleteCategory(id);
-        return new ResponseEntity<>(categoryResponseDto,HttpStatus.ACCEPTED);
+    public ResponseEntity<CategoryResponseDto> deleteCategory(@PathVariable(name = "categoryId") Long id) {
+        CategoryResponseDto categoryResponseDto = categoryService.deleteCategory(id);
+        return new ResponseEntity<>(categoryResponseDto, HttpStatus.ACCEPTED);
     }
 
+    @PutMapping("/update/{categoryId}")
+    public ResponseEntity<CategoryResponseDto> updateCategoryName(@RequestParam String categoryName,
+                                                              @PathVariable Long categoryId){
+        CategoryResponseDto categoryResponseDto=categoryService.updateCategoryName(categoryName,categoryId);
+        return new ResponseEntity<>(categoryResponseDto,HttpStatus.ACCEPTED);
+    }
 }
