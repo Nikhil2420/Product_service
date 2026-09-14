@@ -1,9 +1,9 @@
 package com.ProductService.backend.repository;
 
-import com.ProductService.backend.entity.Address;
+import com.ProductService.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AddressRepository extends JpaRepository<Address,Long> {
+public interface UserRepository extends JpaRepository<User,Long> {
 }

@@ -33,10 +33,10 @@ public class Purchase {
 
     private LocalDateTime orderDate;
 
-    private Long userId;
-    private String userName;
-    private String role;
-    @OneToOne(cascade=CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "user_fk_id", referencedColumnName = "userId")
+    private User user;
+    @OneToOne(cascade = CascadeType.ALL)
     /*
         name : What is the name of the foreign-key column in the current entity's table?
         referencedColumnName: Which column in the Address table does that foreign key point to?
@@ -44,11 +44,11 @@ public class Purchase {
     /*
         unique = true should prevent the same Address row from being referenced by two different Purchase rows
      */
-    @JoinColumn(name="address_fk_id",referencedColumnName = "addressId",unique = true)
+    @JoinColumn(name = "address_fk_id", referencedColumnName = "addressId", unique = true)
     private Address address;
 
     @PrePersist
-    public void onCreate(){
-        orderDate=LocalDateTime.now();
+    public void onCreate() {
+        orderDate = LocalDateTime.now();
     }
 }

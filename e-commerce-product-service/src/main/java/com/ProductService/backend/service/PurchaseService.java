@@ -5,12 +5,10 @@ import com.ProductService.backend.dto.DeliveryInfoDto;
 import com.ProductService.backend.dto.ProductResponseDto;
 import com.ProductService.backend.dto.PurchaseRequestDto;
 import com.ProductService.backend.dto.PurchaseResponseDto;
-import com.ProductService.backend.entity.Address;
-import com.ProductService.backend.entity.DeliveryInfo;
-import com.ProductService.backend.entity.Product;
-import com.ProductService.backend.entity.Purchase;
+import com.ProductService.backend.entity.*;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.repository.PurchaseRepository;
+import com.ProductService.backend.repository.UserRepository;
 import com.ProductService.backend.utility.PurchaseUtility;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +24,7 @@ public class PurchaseService {
     private final ProductService productService;
     private final ProductRepository productRepository;
     private final PurchaseRepository purchaseRepository;
+    private final UserRepository userRepository;
 
     public PurchaseResponseDto buyProduct(@Valid PurchaseRequestDto purchaseRequestDto) {
 
@@ -42,29 +41,29 @@ public class PurchaseService {
         }
         product.setTotalProductSold(product.getTotalProductSold() + 1);
         productRepository.save(product);
-        PurchaseUtility.checkUserDetails(purchaseRequestDto);
 
         DeliveryInfoDto deliveryInfoDto = DeliveryInfoDto.builder()
                 .addressDto(purchaseRequestDto.getAddressDto())
                 .numberOfDays(PurchaseUtility.calculateDaysBasedOnLocation(purchaseRequestDto.getAddressDto()))
                 .shippingStatus(ShippingStatus.PICKED)
                 .build();
-        createPurchaseEntity(purchaseRequestDto, productResponseDto, deliveryInfoDto);
+        Purchase purchase=createPurchaseEntity(purchaseRequestDto, productResponseDto, deliveryInfoDto);
         return PurchaseResponseDto.builder()
                 .productName(purchaseRequestDto.getProductName())
                 .price(productResponseDto.getProductPrice())
                 .orderDateTime(LocalDateTime.now())
                 .paymentStatus(PurchaseUtility.checkPaymentStatus(purchaseRequestDto.getPaymentMethod()))
                 .deliveryInfoDto(deliveryInfoDto)
-                .userId(purchaseRequestDto.getUserId())
-                .userName(purchaseRequestDto.getUserName())
-                .role(purchaseRequestDto.getRole())
+                .userId(purchase.getUser().getUserId())
+                .userName(purchase.getUser().getUserName())
+                .userEmail(purchase.getUser().getUserEmail())
+                .role(purchase.getUser().getUserRole())
                 .build();
 
     }
 
 
-    public void createPurchaseEntity(PurchaseRequestDto purchaseRequestDto, ProductResponseDto productResponseDto, DeliveryInfoDto deliveryInfoDto) {
+    public Purchase createPurchaseEntity(PurchaseRequestDto purchaseRequestDto, ProductResponseDto productResponseDto, DeliveryInfoDto deliveryInfoDto) {
         Address address = Address.builder()
                 .state(purchaseRequestDto.getAddressDto().getState())
                 .city(purchaseRequestDto.getAddressDto().getCity())
@@ -73,6 +72,12 @@ public class PurchaseService {
                 .deliveryInfo(new DeliveryInfo(deliveryInfoDto.getNumberOfDays(), deliveryInfoDto.getShippingStatus()))
                 .build();
 //        checkDuplicateAddress(address);
+        //for first time user we have to create user and save it
+
+       User user=userRepository.findById(purchaseRequestDto.getUserId())
+               .orElseGet(()->createUser(purchaseRequestDto));
+
+
 
         Purchase purchase = Purchase.builder()
                 .productId(purchaseRequestDto.getProductId())
@@ -83,11 +88,9 @@ public class PurchaseService {
                 .paymentMethod(purchaseRequestDto.getPaymentMethod())
                 .paymentStatus(PurchaseUtility.checkPaymentStatus(purchaseRequestDto.getPaymentMethod()))
                 .address(address)
-                .userId(purchaseRequestDto.getUserId())
-                .userName(purchaseRequestDto.getUserName())
-                .role(purchaseRequestDto.getRole())
+                .user(user)
                 .build();
-        purchaseRepository.save(purchase);
+        return purchaseRepository.save(purchase);
 
     }
 
@@ -101,7 +104,7 @@ public class PurchaseService {
 
 
     public List<PurchaseResponseDto> getPurchaseHistory(Long userId) {
-        List<Purchase> purchases = purchaseRepository.findByUserId(userId);
+        List<Purchase> purchases = purchaseRepository.findByUser_UserId(userId);
         return PurchaseUtility.mapListOfPurchaseToListOfPurchaseResponseDto(purchases);
     }
 
@@ -127,5 +130,16 @@ public class PurchaseService {
                 .setShippingStatus(ShippingStatus.CANCELLED);
         purchaseRepository.save(purchase);
         return PurchaseUtility.mapPurchaseToPurchaseResponseDto(purchase);
+    }
+
+    public User createUser(PurchaseRequestDto purchaseRequestDto){
+        User user=User.builder()
+                .userId(purchaseRequestDto.getUserId())
+                .userName(purchaseRequestDto.getUserName())
+                .userRole(purchaseRequestDto.getRole())
+                .userEmail(purchaseRequestDto.getUserEmail())
+                .address(PurchaseUtility.mapAddressDtoToAddress(purchaseRequestDto.getAddressDto()))
+                .build();
+        return userRepository.save(user);
     }
 }

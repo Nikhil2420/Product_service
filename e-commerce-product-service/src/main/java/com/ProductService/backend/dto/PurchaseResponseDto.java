@@ -20,4 +20,5 @@ public class PurchaseResponseDto {
     private Long userId;
     private String userName;
     private String role;
+    private String userEmail;
 }
