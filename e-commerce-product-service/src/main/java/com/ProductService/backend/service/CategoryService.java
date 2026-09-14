@@ -56,4 +56,16 @@ public class CategoryService {
                 .productDtoList(ProductMapper.mapProductToProductDto(category.getProductList()))
                 .build();
     }
+
+    public CategoryResponseDto updateCategoryName(String categoryName, Long categoryId) {
+        Category category=categoryRepository.findById(categoryId)
+                .orElseThrow(()->new RuntimeException("No category found for this categoryId"+" : "+categoryId));
+
+        category.setCategoryName(categoryName);
+        categoryRepository.save(category);
+        return CategoryResponseDto.builder()
+                .CategoryName(categoryName)
+                .productDtoList(ProductMapper.mapProductToProductDto(category.getProductList()))
+                .build();
+    }
 }
