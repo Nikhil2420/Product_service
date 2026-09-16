@@ -3,6 +3,7 @@ package com.ProductService.backend.service;
 import com.ProductService.backend.dto.CategoryRequestDto;
 import com.ProductService.backend.dto.CategoryResponseDto;
 import com.ProductService.backend.entity.Category;
+import com.ProductService.backend.exception.CategoryNotFoundException;
 import com.ProductService.backend.repository.CategoryRepository;
 import com.ProductService.backend.utility.ProductMapper;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class CategoryService {
     public CategoryResponseDto deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("No Category found for this id" + " : " + id)
+                        new CategoryNotFoundException("No Category found for this id" + " : " + id)
                 );
         /*
             we have to delete related  product also that belong to this category;
@@ -59,7 +60,7 @@ public class CategoryService {
 
     public CategoryResponseDto updateCategoryName(String categoryName, Long categoryId) {
         Category category=categoryRepository.findById(categoryId)
-                .orElseThrow(()->new RuntimeException("No category found for this categoryId"+" : "+categoryId));
+                .orElseThrow(()->new CategoryNotFoundException("No category found for this categoryId"+" : "+categoryId));
 
         category.setCategoryName(categoryName);
         categoryRepository.save(category);
