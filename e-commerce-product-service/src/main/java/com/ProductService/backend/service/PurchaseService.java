@@ -6,6 +6,8 @@ import com.ProductService.backend.dto.ProductResponseDto;
 import com.ProductService.backend.dto.PurchaseRequestDto;
 import com.ProductService.backend.dto.PurchaseResponseDto;
 import com.ProductService.backend.entity.*;
+import com.ProductService.backend.exception.ProductNotFoundException;
+import com.ProductService.backend.exception.PurchaseNotFoundException;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.repository.PurchaseRepository;
 import com.ProductService.backend.repository.UserRepository;
@@ -34,7 +36,7 @@ public class PurchaseService {
         //isAvailable logic code
 
         Product product = productRepository.findById(purchaseRequestDto.getProductId()).orElseThrow(() ->
-                new RuntimeException("No product found for this productId" + ":" + purchaseRequestDto.getProductId()));
+                new ProductNotFoundException("No product found for this productId" + ":" + purchaseRequestDto.getProductId()));
         product.setStockQuantity(product.getStockQuantity() - purchaseRequestDto.getQuantity());
         if (product.getStockQuantity() == 0) {
             product.setAvailable(false);
@@ -97,7 +99,7 @@ public class PurchaseService {
 
     public PurchaseResponseDto getPurchaseById(Long purchaseId) {
         Purchase purchase = purchaseRepository.findById(purchaseId).orElseThrow(() ->
-                new RuntimeException("No Purchase found for this purchaseId:" + " " + purchaseId)
+                new PurchaseNotFoundException("No Purchase found for this purchaseId:" + " " + purchaseId)
         );
         return PurchaseUtility.mapPurchaseToPurchaseResponseDto(purchase);
     }
@@ -111,12 +113,12 @@ public class PurchaseService {
     public PurchaseResponseDto cancelProduct(Long purchaseId) {
         Purchase purchase = purchaseRepository.findById(purchaseId)
                 .orElseThrow(() -> (
-                        new RuntimeException("No Purchase found for the provided purchase id:" + " : " + purchaseId)
+                        new PurchaseNotFoundException("No Purchase found for the provided purchase id:" + " : " + purchaseId)
                 ));
 
         PurchaseUtility.validatePurchaseShippingState(purchase);
         Product product = productRepository.findById(purchase.getProductId())
-                .orElseThrow(() -> new RuntimeException("No product found for this productId" + " : " + purchase.getProductId()));
+                .orElseThrow(() -> new ProductNotFoundException("No product found for this productId" + " : " + purchase.getProductId()));
 
         //RefundLogic If payment method upi
         product.setStockQuantity(product.getStockQuantity() + purchase.getQuantity());

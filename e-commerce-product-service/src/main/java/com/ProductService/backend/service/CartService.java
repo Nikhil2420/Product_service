@@ -3,6 +3,9 @@ package com.ProductService.backend.service;
 import com.ProductService.backend.constants.ShippingStatus;
 import com.ProductService.backend.dto.*;
 import com.ProductService.backend.entity.*;
+import com.ProductService.backend.exception.CartNotFoundException;
+import com.ProductService.backend.exception.ProductNotFoundException;
+import com.ProductService.backend.exception.UserNotFoundException;
 import com.ProductService.backend.repository.CartRepository;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.repository.PurchaseRepository;
@@ -71,14 +74,14 @@ public class CartService {
 
     public User findUserOrElseThrowException(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found for this userId" + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found for this userId" + userId));
     }
 
     private List<Product> findProductsOrElseThrowException(List<ProductQuantityDto> productQuantityDto) {
         return productQuantityDto.stream()
                 .map(productQuantityDto1 -> {
                     return productRepository.findById(productQuantityDto1.getProductId())
-                            .orElseThrow(() -> new RuntimeException("No product found for this productId" + productQuantityDto1.getProductId()));
+                            .orElseThrow(() -> new ProductNotFoundException("No product found for this productId" + productQuantityDto1.getProductId()));
                 }).toList();
     }
 
@@ -202,7 +205,7 @@ public class CartService {
         User user=findUserOrElseThrowException(userId);
         Cart cart=user.getCart();
         if(cart==null){
-            throw new RuntimeException("Cart is empty for the user with userId"+" "+userId);
+            throw new CartNotFoundException("Cart is empty for the user with userId"+" "+userId);
         }
         List<Product> products=cart.getProducts();
         return ProductMapper.mapProductToProductDto(products);
