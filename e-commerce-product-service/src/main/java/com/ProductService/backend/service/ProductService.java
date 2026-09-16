@@ -4,6 +4,8 @@ import com.ProductService.backend.dto.ProductRequestDto;
 import com.ProductService.backend.dto.ProductResponseDto;
 import com.ProductService.backend.entity.Category;
 import com.ProductService.backend.entity.Product;
+import com.ProductService.backend.exception.CategoryNotFoundException;
+import com.ProductService.backend.exception.ProductNotFoundException;
 import com.ProductService.backend.repository.CategoryRepository;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.utility.ProductMapper;
@@ -22,7 +24,7 @@ public class ProductService {
 
     public ProductResponseDto addProduct(ProductRequestDto productRequestDto) {
         Category category = categoryRepository.findById(productRequestDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new CategoryNotFoundException(
                                 "No category found for the categoryId" + ":" + productRequestDto.getCategoryId()
                         )
                 );
@@ -66,13 +68,13 @@ public class ProductService {
         if (product.isPresent()) {
             return ProductMapper.mapProductToProductResponseDto(product.get());
         }
-        throw new RuntimeException("No product found for this productId" + ":" + productId);
+        throw new ProductNotFoundException("No product found for this productId" + ":" + productId);
     }
 
     public ProductResponseDto updateProduct(ProductRequestDto productRequestDto, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() ->
-                        new RuntimeException("No product found for this productId" + ":" + productId));
+                        new ProductNotFoundException("No product found for this productId" + ":" + productId));
         product.setProductPrice(productRequestDto.getProductPrice());
         product.setProductName(productRequestDto.getProductName());
         product.setStockQuantity(productRequestDto.getStockQuantity());
@@ -84,7 +86,7 @@ public class ProductService {
     public ProductResponseDto deleteProduct(Long id) {
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No product found for this productId" + ":" + id));
+                .orElseThrow(() -> new ProductNotFoundException("No product found for this productId" + ":" + id));
 
 
         /*
