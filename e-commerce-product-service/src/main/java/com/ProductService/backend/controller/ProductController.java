@@ -1,9 +1,11 @@
 package com.ProductService.backend.controller;
 
+import com.ProductService.backend.dto.PaginationResponseDto;
 import com.ProductService.backend.dto.ProductRequestDto;
 import com.ProductService.backend.dto.ProductResponseDto;
 import com.ProductService.backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +29,8 @@ public class ProductController {
 
 
     @GetMapping("/getAllProduct")
-    public ResponseEntity<List<ProductResponseDto>> getAllProduct() {
-        List<ProductResponseDto> productResponseDtos = productService.getAllProducts();
+    public ResponseEntity<PaginationResponseDto<ProductResponseDto>> getAllProduct(Pageable pageable) {
+        PaginationResponseDto<ProductResponseDto> productResponseDtos = productService.getAllProducts(pageable);
         return new ResponseEntity<>(productResponseDtos, HttpStatus.FOUND);
     }
 

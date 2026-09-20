@@ -1,5 +1,6 @@
 package com.ProductService.backend.service;
 
+import com.ProductService.backend.dto.PaginationResponseDto;
 import com.ProductService.backend.dto.ProductRequestDto;
 import com.ProductService.backend.dto.ProductResponseDto;
 import com.ProductService.backend.entity.Category;
@@ -10,6 +11,8 @@ import com.ProductService.backend.repository.CategoryRepository;
 import com.ProductService.backend.repository.ProductRepository;
 import com.ProductService.backend.utility.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,18 +52,27 @@ public class ProductService {
 
     }
 
-    public List<ProductResponseDto> getAllProducts() {
+    public PaginationResponseDto<ProductResponseDto> getAllProducts(Pageable pageable) {
 
-        List<Product> products = productRepository.findAll();
-        List<ProductResponseDto> productResponseDtos = products.stream()
-                /*
+                 /*
                     only return available product
                  */
-                .filter(product->product.isAvailable())
+
+        Page<Product> products = productRepository.findByIsAvailableTrue(pageable);
+        Page<ProductResponseDto> productResponseDtos = products
                 .map(product -> {
                     return ProductMapper.mapProductToProductResponseDto(product);
-                }).toList();
-        return productResponseDtos;
+                });
+        return PaginationResponseDto.<ProductResponseDto>builder()
+                .content(productResponseDtos.getContent())
+                .pageNumber(productResponseDtos.getNumber())
+                .pageSize(productResponseDtos.getSize())
+                .totalElement(productResponseDtos.getTotalElements())
+                .totalPage(productResponseDtos.getTotalPages())
+                .first(productResponseDtos.isFirst())
+                .last(productResponseDtos.isLast())
+                .empty(productResponseDtos.isEmpty())
+                .build();
     }
 
     public ProductResponseDto getProduct(Long productId) {
@@ -106,17 +118,17 @@ public class ProductService {
     }
 
     public List<ProductResponseDto> getTopSellerProduct() {
-        List<Product> products=productRepository.findAll();
+        List<Product> products = productRepository.findAll();
 
-        long max=0;
-        for(Product product:products){
-            max=Math.max(max,(long)product.getTotalProductSold());
+        long max = 0;
+        for (Product product : products) {
+            max = Math.max(max, (long) product.getTotalProductSold());
         }
         long finalMax = max;
         return products.stream()
-                .filter(product->(product.getTotalProductSold()== finalMax))
+                .filter(product -> (product.getTotalProductSold() == finalMax))
                 .map(product -> {
-                   return ProductMapper.mapProductToProductResponseDto(product);
+                    return ProductMapper.mapProductToProductResponseDto(product);
                 }).toList();
 
 

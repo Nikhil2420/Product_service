@@ -2,8 +2,11 @@ package com.ProductService.backend.controller;
 
 import com.ProductService.backend.dto.CategoryRequestDto;
 import com.ProductService.backend.dto.CategoryResponseDto;
+import com.ProductService.backend.dto.PaginationResponseDto;
 import com.ProductService.backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +29,8 @@ public class CategoryController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<List<CategoryResponseDto>> getCategory() {
-        List<CategoryResponseDto> categoryResponseDtos = categoryService.getAllCategory();
+    public ResponseEntity<PaginationResponseDto<CategoryResponseDto>> getCategory(Pageable pageable) {
+        PaginationResponseDto<CategoryResponseDto> categoryResponseDtos = categoryService.getAllCategory(pageable);
         return new ResponseEntity<>(categoryResponseDtos, HttpStatus.ACCEPTED);
     }
 
