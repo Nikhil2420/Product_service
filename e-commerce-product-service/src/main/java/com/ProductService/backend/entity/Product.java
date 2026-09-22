@@ -18,7 +18,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String productName;
 
     private long stockQuantity;
@@ -35,7 +35,7 @@ public class Product {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "cart_fk_id",referencedColumnName = "cartId")
+    @JoinColumn(name = "cart_fk_id", referencedColumnName = "cartId")
     private Cart cart;
 
     // Called automatically before INSERT
