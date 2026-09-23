@@ -25,6 +25,7 @@ public class ServiceLoggingAspect {
                 (..)→ arguments
             )
      */
+
     @Around("execution(* com.ProductService.backend.service..*(..))")
     public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {
 
