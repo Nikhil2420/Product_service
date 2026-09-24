@@ -19,7 +19,7 @@ public class ControllerLoggingAspect {
 
         String methodName = joinPoint.getSignature().getName();
         Object[] arguments = joinPoint.getArgs();
-
+        log.info("Aop logs before controller api hit..");
         log.info(
                 "API HIT | Method: {} | Arguments: {}",
                 methodName,
