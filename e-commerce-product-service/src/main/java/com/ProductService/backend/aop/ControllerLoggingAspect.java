@@ -26,6 +26,7 @@ public class ControllerLoggingAspect {
                 Arrays.toString(arguments)
         );
 
+
         //real method call
         Object result = joinPoint.proceed();
 
